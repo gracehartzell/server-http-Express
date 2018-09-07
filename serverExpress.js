@@ -8,7 +8,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.disable('x-powered-by');
+app.disable('x-powered-by'); // ???
 
 app.get('/guests', (req, res) => {
     fs.readFile(guestsPath, 'utf8', (err, guestsJSON) => {
@@ -20,6 +20,25 @@ app.get('/guests', (req, res) => {
         res.send(guests);
     });
 });
+
+app.get('/guests/:id', (req, res) => {
+    fs.readFile(guestsPath, 'utf8', (err, guestsJSON) => {
+      if (err) {
+        console.error(err.stack);
+        res.sendStatus(500);
+      }
+  
+      var id = Number.parseInt(req.params.id);
+      var guests = JSON.parse(guestsJSON);
+  
+      if (id < 0 || id >= guests.length || Number.isNaN(id)) {
+        return res.sendStatus(404);
+      }
+  
+      res.set('Content-Type', 'text/plain');
+      res.send(guests[id]);
+    });
+  });
 
 app.use((req, res) => {
     res.sendStatus(404);
